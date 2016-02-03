@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
+using HtmlAgilityPack;
 
 namespace EastmoneySpiderConsoleApplication
 {
@@ -45,19 +47,33 @@ namespace EastmoneySpiderConsoleApplication
                 return ex.Message;
             }
         }
+
+        public static System.IO.Stream GetUrlToStream(string Url)
+        {
+            System.Net.WebRequest wReq = System.Net.WebRequest.Create(Url);
+            System.Net.WebResponse wResp = wReq.GetResponse();
+            System.IO.Stream respStream = wResp.GetResponseStream();
+            return respStream;
+        }
         #endregion
 
         #region 类定义
         public class ContentList
         {
             public string listpagecode;
+            
+            
             //获取列表页代码
             public void GetListCode()
             {
-                listpagecode = GetUrltoHtml(ContentListPage1, "gb2312");
+                string listXPath = "//html[1]/body[1]/div[8]/div[1]/div[1]//li";
+                HtmlDocument HtDoc = new HtmlDocument();
+                HtDoc.Load(GetUrlToStream(ContentListPage1));
+                HtmlNode rootNode = HtDoc.DocumentNode;
+                HtmlNodeCollection listBoxNode =rootNode.SelectNodes(listXPath);
                 listpagecode = listpagecode.Replace("\r", "").Replace("\n", "").Replace("\t","");
                 Regex rx = new Regex(@"<li><span>\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}\w+</a></li>");
-                rx = new Regex(@"<li><span>\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}</span><a href=.*\stitle=.*\starget=.*?</a></li>[^]");
+                rx = new Regex(@"<li><span>\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}</span><a href=.*\stitle=.*\starget=.+?[</a></li>]");
                 Match m = rx.Match(listpagecode);
             }
             
