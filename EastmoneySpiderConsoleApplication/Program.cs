@@ -71,10 +71,7 @@ namespace EastmoneySpiderConsoleApplication
                 HtDoc.Load(GetUrlToStream(ContentListPage1));
                 HtmlNode rootNode = HtDoc.DocumentNode;
                 HtmlNodeCollection listBoxNode =rootNode.SelectNodes(listXPath);
-                listpagecode = listpagecode.Replace("\r", "").Replace("\n", "").Replace("\t","");
-                Regex rx = new Regex(@"<li><span>\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}\w+</a></li>");
-                rx = new Regex(@"<li><span>\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}</span><a href=.*\stitle=.*\starget=.+?[</a></li>]");
-                Match m = rx.Match(listpagecode);
+                listpagecode = listBoxNode[1].InnerHtml;
             }
             
         }
@@ -86,7 +83,8 @@ namespace EastmoneySpiderConsoleApplication
 
         static void Main(string[] args)
         {
-            Console.WriteLine("抓取系统开始工作");
+            Console.WriteLine("抓取系统开始工作...");
+            Console.WriteLine("实例化列表页类并尝试获取前2页列表页信息...");
             ContentList CL = new ContentList();
             CL.GetListCode();
             Console.WriteLine(CL.listpagecode);
